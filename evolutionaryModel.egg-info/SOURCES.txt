@@ -1,5 +1,0 @@
-setup.py
-evolutionaryModel.egg-info/PKG-INFO
-evolutionaryModel.egg-info/SOURCES.txt
-evolutionaryModel.egg-info/dependency_links.txt
-evolutionaryModel.egg-info/top_level.txt
