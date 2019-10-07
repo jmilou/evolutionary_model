@@ -43,7 +43,7 @@ class EvolutionaryModel():
     _path = os.path.dirname(os.path.abspath(__file__))    
 #    _path = '/Users/jmilli/Dropbox/lib_py/evolutionary_model'
     
-    def __init__(self,model='AMES-Cond',ins='SPHERE',Mstar=None,distance=None,**kwargs):
+    def __init__(self,model='AMES-Cond',ins='SPHERE',distance=None,**kwargs):
         """
         Constructor of the EvolutionaryModel object. It reads the ascii table 
         
@@ -53,9 +53,6 @@ class EvolutionaryModel():
             files (for instance 'model.AMES-Cond-2000.M-0.0.SPHERE.Vega.txt').
             - ins: instrument ('SPHERE','NaCo','2MASS'... depending on the 
                     instrument models downloaded in _path from F. Allard's website)
-            - Mstar: (optional) mass of the star in solar mass (if you provide Mstar and if
-                      the evolutionary model file contains a column called M/Ms then the Mplanet property is available
-                      with Mplanet given in Jupiter mass)
             - distance: (optional) distance of the star in parsec. (if 
              you provide the distance, then the apparent magnitude for each filter 
              is available through the key '<filter_name>_apparent')
@@ -82,12 +79,7 @@ class EvolutionaryModel():
             print(e)
             return
 
-        if Mstar is not None:
-            self.Mstar = Mstar * u.Msun
-        else:
-            self.Mstar = None
         self.distance = distance
-#        self.Mplanet = Mplanet * u.jupiterMass
         self.listOfDicos=[]
         line_index_age_bin = []
         for k,v in kwargs.items():
@@ -110,8 +102,8 @@ class EvolutionaryModel():
                 for i,origColumnName in enumerate(origColumnNames):
                     table_tmp.rename_column(origColumnName,finalColumnName[i])
                 dico_tmp = dict(table_tmp)
-                if self.Mstar != None and 'M/Ms' in dico_tmp.keys():
-                    dico_tmp['Mplanet'] = (np.asarray(dico_tmp['M/Ms'])*self.Mstar/u.Mjupiter).to(u.dimensionless_unscaled)
+                if 'M/Ms' in dico_tmp.keys():
+                    dico_tmp['Mplanet'] = (np.asarray(dico_tmp['M/Ms'])*u.Msun/u.Mjupiter).to(u.dimensionless_unscaled)
                 if self.distance != None:
                     for key in finalColumnName[6:]: # we skip the first columns that are not magnotude
                         #dico_tmp[key] is an absolute magnitude
@@ -203,57 +195,97 @@ if __name__=='__main__':
     # planet mass) but also the distance (to get the absolute mag) and the B_Ks
     # magnitude (to get the contrast)
 
-    model = EvolutionaryModel(model='BT-Settl',ins='2MASS')
-    mag_abs_J_pl = model.interpolate_property(0.130,0.1,'M/Ms','J')    
-    
-    model = EvolutionaryModel(Mstar=1,distance=4,B_Ks=4)
-    apparent_mag_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_apparent')
-    contrast_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_contrast')
-    contrast_Ks = model.interpolate_property(0.01,5,'B_Ks_contrast','Mplanet')
-
-    # if for some reasons you want the full arrays:
-    mass_ratio_array,absolute_mag_Ks = model._interpolate_age(0.01,'M/Ms','B_Ks')
-
-    # Bug to fix:
-    model = EvolutionaryModel(model='AMES-Cond',ins='2MASS',Mstar=1,distance=10,K=5)
-    planet_mass = model.interpolate_property(0.9,5,'K_contrast','Mplanet')
-
-    # Second set of test tailored for HD206893:
-    model = EvolutionaryModel(Mstar=1.24,model='AMES-Cond',ins='SPHERE',distance=38.34,B_H=5.69)
-    planet_mass = model.interpolate_property(0.2,16.79,'B_H_apparent','Mplanet')
-    planet_radius_Gcm = model.interpolate_property(0.2,16.79,'B_H_apparent','R(Gcm')
-    planet_Teff = model.interpolate_property(0.2,16.79,'B_H_apparent','Teff(K)')
-    planet_logg = model.interpolate_property(0.2,16.79,'B_H_apparent','lg(g)')
-    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
-    print(planet_radius_Rjup)
- 
-    model = EvolutionaryModel(Mstar=1.24,model='AMES-Cond',ins='NaCo',distance=38.34,Lprime=5.52)
-    planet_mass = model.interpolate_property(0.2,13.43,'Lprime_apparent','Mplanet')
-    planet_Teff = model.interpolate_property(0.2,16.79,'Lprime_apparent','Teff(K)')
-    planet_radius_Gcm = model.interpolate_property(0.2,16.79,'Lprime_apparent','R(Gcm')
-    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
-    print(planet_radius_Rjup)
-    planet_logg = model.interpolate_property(0.2,16.79,'Lprime_apparent','lg(g)')
-    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
-
+#    model = EvolutionaryModel(model='BT-Settl',ins='2MASS')
+#    mag_abs_J_pl = model.interpolate_property(0.130,0.1,'M/Ms','J')    
+#    
+#    model = EvolutionaryModel(distance=4,B_Ks=4)
+#    apparent_mag_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_apparent')
+#    contrast_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_contrast')
+#    contrast_Ks = model.interpolate_property(0.01,5,'B_Ks_contrast','Mplanet')
+#
+#    # if for some reasons you want the full arrays:
+#    mass_ratio_array,absolute_mag_Ks = model._interpolate_age(0.01,'M/Ms','B_Ks')
+#
+#    model = EvolutionaryModel(model='AMES-Cond',ins='2MASS',distance=10,K=5)
+#    planet_mass = model.interpolate_property(0.9,5,'K_contrast','Mplanet')
+#
+#    # Second set of test tailored for HD206893:
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=38.34,B_Ks=5.593)
+##    planet_mass = model.interpolate_property(0.2,16.79,'B_H_apparent','Mplanet')
+#    contrast_H = model.interpolate_property(0.05,15,'Mplanet','B_Ks_contrast') 
+#    print(np.power(10,-contrast_H/2.5)) #1.2e-4
+#    planet_radius_Gcm = model.interpolate_property(0.2,16.79,'B_H_apparent','R(Gcm')
+#    planet_Teff = model.interpolate_property(0.2,16.79,'B_H_apparent','Teff(K)')
+#    planet_logg = model.interpolate_property(0.2,16.79,'B_H_apparent','lg(g)')
+#    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
+#    print(planet_radius_Rjup)
+# 
+#    model = EvolutionaryModel(model='AMES-Cond',ins='NaCo',distance=38.34,Lprime=5.52)
+#    planet_mass = model.interpolate_property(0.2,13.43,'Lprime_apparent','Mplanet')
+#    planet_Teff = model.interpolate_property(0.2,16.79,'Lprime_apparent','Teff(K)')
+#    planet_radius_Gcm = model.interpolate_property(0.2,16.79,'Lprime_apparent','R(Gcm')
+#    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
+#    print(planet_radius_Rjup)
+#    planet_logg = model.interpolate_property(0.2,16.79,'Lprime_apparent','lg(g)')
+#    planet_radius_Rjup = planet_radius_Gcm*0.01 * 1.e9 / (u.R_jup.to(u.meter))
+#
     # For beta Pic with SPHERE
-    model_bPic_NaCo = EvolutionaryModel(model='AMES-Cond',ins='NaCo',Mstar=1.64,distance=19.44,Lprime=5.52)
-    age = 0.025
-    contrast_Lp = model_bPic_NaCo.interpolate_property(age,10,'Mplanet','Lprime_contrast') #7.75
-    model_bPic_SPHERE = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',Mstar=1.64,distance=19.44,B_H=3.5,B_Ks=3.5)
-    contrast_H = model_bPic_SPHERE.interpolate_property(age,10,'Mplanet','B_H_contrast') #12.2
-    contrast_Ks = model_bPic_SPHERE.interpolate_property(age,10,'Mplanet','B_Ks_contrast') #11.65
-    
-    model = EvolutionaryModel(Mstar=1.,model='AMES-Cond',ins='SPHERE',distance=100.0,B_H=8.4)
-    planet_mass = model.interpolate_property(0.06,np.array([1,2,3]),'B_H_contrast','Mplanet')
-    print(planet_mass)
+#    model_bPic_NaCo = EvolutionaryModel(model='AMES-Cond',ins='NaCo',distance=19.44,Lprime=5.52)
+#    age = 0.023
+#    contrast_Lp = model_bPic_NaCo.interpolate_property(age,10,'Mplanet','Lprime_contrast') #7.75
+#    model_bPic_SPHERE = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',Mstar=1.64,distance=19.44,B_H=3.5,B_Ks=3.5)
+#    contrast_H = model_bPic_SPHERE.interpolate_property(age,10,'Mplanet','B_H_contrast') #12.2
+#    contrast_Ks = model_bPic_SPHERE.interpolate_property(age,10,'Mplanet','B_Ks_contrast') #11.65
+#    print(np.power(10,-contrast_H/2.5))
+#    print(np.power(10,-contrast_Ks/2.5))
+#    contrast_Ks_measured = 11.2-2
+#    print(np.power(10,-contrast_Ks_measured/2.5))
+#    
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=100.0,B_H=8.4)
+#    planet_mass = model.interpolate_property(0.06,np.array([1,2,3]),'B_H_contrast','Mplanet')
+#    print(planet_mass)
+#
+#    model = EvolutionaryModel(model='BT-Settl',ins='2MASS',distance=1./0.026,H=5.9)
+#    planet_mass = model.interpolate_property(0.06,7.25,'H_contrast','Mplanet')
+#    print(planet_mass)
+#    
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=1/0.00984,D_K1=6.65)
+#    planet_mass = model.interpolate_property(0.01,6.35,'D_K1_contrast','Mplanet')
+#    print(planet_mass)
+#    
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=1/0.014,B_H=5.664)
+#    for age in np.array([0.01,0.045,0.1,0.5]):
+#        planet_mass = model.interpolate_property(age,10.6,'B_H_contrast','Mplanet')
+#        print(planet_mass)
 
-    model = EvolutionaryModel(Mstar=1.,model='BT-Settl',ins='2MASS',distance=1./0.026,H=5.9)
-    planet_mass = model.interpolate_property(0.06,7.25,'H_contrast','Mplanet')
-    print(planet_mass)
+#    # For GJ3998
+#    contrast=6.8e-6
+#    delta_mag = -2.5*np.log10(contrast)
+#    mag_star = 7.02
+#    separation = 4.9#arcsec
+#    star_dist = 1/0.055#pc
+#    separation_au = separation*star_dist
+#    mag_companion = mag_star+delta_mag
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=1/0.055,B_H=7.02)
+#    for age in np.array([0.1,0.5,1,5]):
+#        planet_mass = model.interpolate_property(age,delta_mag,'B_H_contrast','Mplanet')
+#        print(planet_mass)
+
+#    # For AU Mic
+#    contrast=0.00005
+#    delta_mag = -2.5*np.log10(contrast)
+##    delta_mag = 7.5
+#    mag_star = 4.8
+#    star_dist = 1./0.1028#pc
+#    age = 0.023
+#    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=star_dist,B_Ks=mag_star)
+#    planet_mass = model.interpolate_property(age,delta_mag,'B_Ks_contrast','Mplanet')
+#    print(planet_mass)
     
-    model = EvolutionaryModel(Mstar=1.9,model='AMES-Cond',ins='SPHERE',distance=1/0.00984,D_K1=6.65)
-    planet_mass = model.interpolate_property(0.01,6.35,'D_K1_contrast','Mplanet')
+    # For HD95086
+    model = EvolutionaryModel(model='AMES-Cond',ins='NaCo',distance=90.4,Lprime=6.70) 
+    age=0.017
+    contrast_lp=9.79
+    planet_mass = model.interpolate_property(age,contrast_lp,'Lprime_contrast','Mplanet')
     print(planet_mass)
-    
     
