@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+    #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Mar 24 01:09:33 2017
@@ -283,9 +283,33 @@ if __name__=='__main__':
 #    print(planet_mass)
     
     # For HD95086
-    model = EvolutionaryModel(model='AMES-Cond',ins='NaCo',distance=90.4,Lprime=6.70) 
-    age=0.017
-    contrast_lp=9.79
-    planet_mass = model.interpolate_property(age,contrast_lp,'Lprime_contrast','Mplanet')
-    print(planet_mass)
+#    model = EvolutionaryModel(model='AMES-Cond',ins='NaCo',distance=90.4,Lprime=6.70) 
+#    age=0.017
+#    contrast_lp=9.79
+#    planet_mass = model.interpolate_property(age,contrast_lp,'Lprime_contrast','Mplanet')
+#    print(planet_mass)
     
+#     # For Tap26
+#     model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=147.,D_K1=9.27) 
+#     age=0.017
+# #    contrast_K=-2.5*np.log10(6.e-5)
+#     contrast_K=-2.5*np.log10(4.e-4)
+#     planet_mass = model.interpolate_property(age,contrast_K,'D_K1_contrast','Mplanet')
+#     print(planet_mass)
+
+
+    # # For benchmarking with Arthur's code:
+    # model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=18.16,D_K2=6.816) 
+    # age=5.0
+    # contrast_flux = np.array([1.e-4,1.e-5])
+    # contrast_mag =-2.5*np.log10(contrast_flux)
+    # planet_mass = model.interpolate_property(age,contrast_mag,'D_K2_contrast','Mplanet')
+    # print(planet_mass)
+
+    # For benchmarking with Arthur's code:
+    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=12.941,B_J=5.41) 
+    age=6.9
+    contrast_flux = np.array([2.e-6])
+    contrast_mag =-2.5*np.log10(contrast_flux)
+    planet_mass = model.interpolate_property(age,contrast_mag,'B_J_contrast','Mplanet')
+    print(planet_mass)
