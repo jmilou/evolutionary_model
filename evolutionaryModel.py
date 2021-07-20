@@ -1,4 +1,4 @@
-    #!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Mar 24 01:09:33 2017
@@ -37,12 +37,9 @@ class EvolutionaryModel():
         - _interpolate_age
         - interpolate_property
     """ 
-    
-    #This path has to be adjusted to the location where the evolutionary models 
-    # are stored in txt file
-    _path = os.path.dirname(os.path.abspath(__file__))    
-#    _path = '/Users/jmilli/Dropbox/lib_py/evolutionary_model'
-    
+
+    _path = os.path.dirname(os.path.abspath(__file__))        
+
     def __init__(self,model='AMES-Cond',ins='SPHERE',distance=None,**kwargs):
         """
         Constructor of the EvolutionaryModel object. It reads the ascii table 
@@ -157,19 +154,6 @@ class EvolutionaryModel():
             - prop1 and prop2: strings corresponding to the column name requested
             (generally 'M/Ms','Teff(K)','L/Ls','lg(g)','R(Gcm','D','Li','J')
         """
-#        prop1_array,prop2_array = self._interpolate_age(age_value,prop1,prop2)
-#        interp_function = interp1d(prop1_array,prop2_array,bounds_error=True)
-#        try:
-#            prop2_value = float(interp_function(prop1_value))
-#        except ValueError as e:
-#            print('ValueError: {0:s}'.format(str(e)))
-#            print('The property {0:s} of {1:.5f} is out of range'.format(prop1,prop1_value))
-#            print('Returning NaN')
-#            return np.nan
-#        print('For an age of {0:.4f} Gyr and {1:s}={2:.3f}, the model gives {3:s}={4:.3f}'.format(
-#                age_value,prop1,prop1_value,prop2,prop2_value))
-#        return prop2_value
-
         indices = self._find_lower_upper_index(age_value,self.age)
         age_before,age_after = self.age[indices[0]],self.age[indices[1]]
         print('Interpolating {0:.3f} linearily between {1:.3f} Gyrs and {2:.3f} Gyrs'.format(age_value,age_before,age_after))
@@ -195,13 +179,13 @@ if __name__=='__main__':
     # planet mass) but also the distance (to get the absolute mag) and the B_Ks
     # magnitude (to get the contrast)
 
-#    model = EvolutionaryModel(model='BT-Settl',ins='2MASS')
-#    mag_abs_J_pl = model.interpolate_property(0.130,0.1,'M/Ms','J')    
-#    
-#    model = EvolutionaryModel(distance=4,B_Ks=4)
-#    apparent_mag_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_apparent')
-#    contrast_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_contrast')
-#    contrast_Ks = model.interpolate_property(0.01,5,'B_Ks_contrast','Mplanet')
+    model = EvolutionaryModel(model='BT-Settl',ins='2MASS')
+    mag_abs_J_pl = model.interpolate_property(0.130,0.1,'M/Ms','J')    
+    
+    model = EvolutionaryModel(distance=4,B_Ks=4)
+    apparent_mag_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_apparent')
+    contrast_Ks = model.interpolate_property(0.01,5,'Mplanet','B_Ks_contrast')
+    contrast_Ks = model.interpolate_property(0.01,5,'B_Ks_contrast','Mplanet')
 #
 #    # if for some reasons you want the full arrays:
 #    mass_ratio_array,absolute_mag_Ks = model._interpolate_age(0.01,'M/Ms','B_Ks')
@@ -307,9 +291,29 @@ if __name__=='__main__':
     # print(planet_mass)
 
     # For benchmarking with Arthur's code:
-    model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=12.941,B_J=5.41) 
-    age=6.9
-    contrast_flux = np.array([2.e-6])
-    contrast_mag =-2.5*np.log10(contrast_flux)
-    planet_mass = model.interpolate_property(age,contrast_mag,'B_J_contrast','Mplanet')
-    print(planet_mass)
+    # model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=12.941,B_J=5.41) 
+    # age=6.9
+    # contrast_flux = np.array([2.e-6])
+    # contrast_mag =-2.5*np.log10(contrast_flux)
+    # planet_mass = model.interpolate_property(age,contrast_mag,'B_J_contrast','Mplanet')
+    # print(planet_mass)
+
+
+    # For Wolf1061
+    # contrast=2.9e-7
+    # delta_mag = -2.5*np.log10(contrast)
+    # mag_star = 5.373
+    # # separation = 4.9#arcsec
+    # star_dist = 4.31 #pc
+    # # separation_au = separation*star_dist
+    # mag_companion = mag_star+delta_mag
+    # model = EvolutionaryModel(model='AMES-Cond',ins='SPHERE',distance=star_dist,D_H2=mag_star)
+    # for age in np.array([1,2,3,5]):
+    #     planet_mass = model.interpolate_property(age,delta_mag,'D_H2_contrast','Mplanet')
+    #     print(planet_mass)
+
+
+    # for age in np.array([1,2,3,5]):
+    #     K2_mag = model.interpolate_property(age,delta_mag,'D_H2_contrast','D_K2')
+    #     print(planet_mass)
+
